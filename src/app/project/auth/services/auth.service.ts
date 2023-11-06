@@ -12,30 +12,27 @@ export class AuthService {
 
   private http = inject(HttpClient);
 
-  // private _currentUser = signal<Usuario | null>(null);
-  // private _authStatus = signal<AuthStatus>(AuthStatus.checking);
+  private _currentUser = signal<Usuario | null>(null);
+  private _authStatus = signal<AuthStatus>(AuthStatus.checking);
 
-  // public currentUser = computed(() => this._currentUser());
-  // public authStatus = computed(() => this._authStatus());
+  public currentUser = computed(() => this._currentUser());
+  public authStatus = computed(() => this._authStatus());
 
   constructor() {}
 
-  login(username: string, password: string): any {
+  login(username: string, password: string): Observable<boolean> {
     const url = `${this.baseUrl}/login`;
     const body = { username, password };
 
-    return this.http.post<any>(url, body)
-    //.pipe(
-      // tap(({ User, token }) => {
-      //   this._currentUser.set(User);
-      //   this._authStatus.set(AuthStatus.aunthenticated);
-      //   localStorage.setItem('token', token);
-
-      //   console.log({ User, token });
-      // }),
-      // map(() => true)
+    return this.http.post<any>(url, body).pipe(
+      tap(({ User, token }) => {
+        this._currentUser.set(User);
+        this._authStatus.set(AuthStatus.aunthenticated);
+        localStorage.setItem('token', token);
+      }),
+      map(() => true)
 
       //TODO: ERRORES
-  //  );
+    );
   }
 }
